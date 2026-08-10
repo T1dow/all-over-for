@@ -1,0 +1,71 @@
+<%- include('../partials/head') %>
+
+<div class="row align-items-center g-4">
+  <div class="col-lg-7">
+    <h1 class="display-6 fw-bold text-primary"><%= schoolName %></h1>
+    <p class="lead">Automated Payroll Management System with Scheduled Employee Payslip Email Notifications</p>
+    <p class="text-muted">This system automates the school's monthly payroll: salary calculation, payslip generation,
+      email delivery, reports, and a complete audit trail — accurately, securely, and on schedule.</p>
+
+    <div class="card mt-4 shadow-sm">
+      <div class="card-header bg-white fw-semibold">System status — Stage 1 (Project Setup) check</div>
+      <ul class="list-group list-group-flush small">
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Application server</span><span class="badge text-bg-success">RUNNING</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Database connection</span><span class="badge text-bg-success">CONNECTED</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Migrations</span><span class="badge text-bg-success">APPLIED</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Security headers (Helmet + CSP)</span><span class="badge text-bg-success">ACTIVE</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>CSRF protection</span><span class="badge text-bg-success">ACTIVE</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Rate limiting</span><span class="badge text-bg-success">ACTIVE</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Authentication &amp; roles</span><span class="badge text-bg-secondary">STAGE 3</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Payroll engine &amp; email</span><span class="badge text-bg-secondary">STAGES 8–12</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white fw-semibold">Project roadmap</div>
+      <div class="card-body">
+        <ol class="mb-0 small lh-lg">
+          <li class="text-success fw-semibold">✓ Analysis &amp; requirements (docs 00–02)</li>
+          <li class="text-success fw-semibold">✓ Stage 1 — Project setup</li>
+          <li class="text-success fw-semibold">✓ Stage 2 — Database setup</li>
+          <li>Stage 3 — Authentication</li>
+          <li>Stage 4 — User roles &amp; permissions</li>
+          <li>Stage 5 — Employee management</li>
+          <li>Stage 6 — Salary, allowances &amp; deductions</li>
+          <li>Stage 8 — Payroll calculation engine</li>
+          <li>Stage 9 — Payroll processing (duplicate-safe)</li>
+          <li>Stage 10 — Payslip PDF generation</li>
+          <li>Stage 11 — Email notifications</li>
+          <li>Stage 12 — Scheduled processing</li>
+          <li>Stages 13–16 — Reports, audit, testing, deployment</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card mt-3 shadow-sm">
+      <div class="card-body small text-muted">
+        Health probe: <a href="/health">/health</a> · Source: Node.js + Express + Sequelize ·
+        Database: PostgreSQL (SQLite fallback mode supported)
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

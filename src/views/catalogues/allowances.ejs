@@ -1,0 +1,41 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Allowance catalogue</h4>
+  <a href="/allowances/new" class="btn btn-primary btn-sm">+ New allowance</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th><th>Code</th><th>Type</th><th>Taxable</th>
+          <th>Default</th><th>Status</th><th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(function(r) { %>
+          <tr>
+            <td><%= r.name %></td>
+            <td class="font-monospace small text-muted"><%= r.code %></td>
+            <td><span class="badge text-bg-secondary"><%= r.type %></span></td>
+            <td><%= r.taxable ? 'Yes' : 'No' %></td>
+            <td class="small">
+              <% if (r.type === 'FIXED' && r.default_amount !== null) { %>GH₵ <%= Number(r.default_amount).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %><% } %>
+              <% if (r.type === 'PERCENT' && r.default_percent !== null) { %><%= r.default_percent %>% of basic<% } %>
+              <% if (!r.default_amount && !r.default_percent) { %>—<% } %>
+            </td>
+            <td>
+              <% if (r.is_active) { %><span class="badge text-bg-success">Active</span><% } else { %><span class="badge text-bg-secondary">Inactive</span><% } %>
+            </td>
+            <td class="text-end"><a href="/allowances/<%= r.id %>/edit" class="btn btn-sm btn-outline-primary">Edit</a></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="text-muted small mt-2">Taxable allowances count toward PAYE chargeable income; non-taxable ones (e.g. book allowance) are paid gross.</p>
+
+<%- include('../partials/footer') %>

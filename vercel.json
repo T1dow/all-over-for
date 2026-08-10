@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "crons": [
+    { "path": "/api/cron/payroll", "schedule": "0 8 25 * *" },
+    { "path": "/api/cron/email",   "schedule": "0 8 * * *" }
+  ]
+}

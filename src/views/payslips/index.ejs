@@ -1,0 +1,85 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0"><%= title %></h4>
+</div>
+
+<% if (!ownOnly) { %>
+  <form method="GET" action="/payslips" class="row g-2 mb-3">
+    <div class="col-md-4">
+      <select class="form-select form-select-sm" name="employee_id">
+        <option value="">All employees</option>
+        <% employees.forEach(function(e) { %>
+          <option value="<%= e.id %>" <%= String(filters.employee_id) === String(e.id) ? 'selected' : '' %>>
+            <%= e.employee_no %> — <%= e.first_name %> <%= e.last_name %>
+          </option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select form-select-sm" name="run_id">
+        <option value="">All runs</option>
+        <% runs.forEach(function(r) { %>
+          <option value="<%= r.id %>" <%= String(filters.run_id) === String(r.id) ? 'selected' : '' %>>
+            <%= r.period_year %>-<%= String(r.period_month).padStart(2, '0') %> (run #<%= r.run_number %>)
+          </option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+    </div>
+  </form>
+<% } %>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <% if (!ownOnly) { %><th>Employee</th><% } %>
+          <th>Period</th>
+          <th class="text-end">Gross</th>
+          <th class="text-end">Net pay</th>
+          <th>PDF</th>
+          <% if (can('payslips.regenerate')) { %><th class="text-end">Actions</th><% } %>
+        </tr>
+      </thead>
+      <tbody>
+        <% payslips.forEach(function(p) { %>
+          <tr>
+            <td class="font-monospace small text-muted"><%= p.reference %></td>
+            <% if (!ownOnly) { %>
+              <td><%= p.employee.employee_no %> — <%= p.employee.first_name %> <%= p.employee.last_name %></td>
+            <% } %>
+            <td><%= p.run.period_year %>-<%= String(p.run.period_month).padStart(2, '0') %> <span class="text-muted small">(paid <%= p.run.pay_date %>)</span></td>
+            <td class="text-end">GH₵ <%= Number(p.gross).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %></td>
+            <td class="text-end fw-semibold">GH₵ <%= Number(p.net).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %></td>
+            <td>
+              <a href="/payslips/<%= p.id %>/pdf" class="btn btn-sm btn-outline-success">⬇ Download PDF</a>
+            </td>
+            <% if (can('payslips.regenerate')) { %>
+              <td class="text-end">
+                <form method="POST" action="/payslips/<%= p.id %>/regenerate" class="d-inline">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="btn btn-sm btn-outline-secondary">Regenerate</button>
+                </form>
+              </td>
+            <% } %>
+          </tr>
+        <% }); %>
+        <% if (!payslips.length) { %>
+          <tr><td colspan="<%= ownOnly ? 5 : 7 %>" class="text-center text-muted py-4">No payslips found.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (ownOnly) { %>
+  <p class="text-muted small mt-2">You can only see your own payslips. For questions about a payslip, contact the
+    payroll office and quote the reference number.</p>
+<% } %>
+
+<%- include('../partials/footer') %>

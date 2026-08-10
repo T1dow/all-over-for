@@ -1,0 +1,45 @@
+<%- include('../partials/head') %>
+
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Process a payroll period</div>
+      <div class="card-body">
+        <p class="text-muted small">
+          The engine will compute SSNIT, PAYE and net pay for every <strong>active</strong> employee
+          and store all payslips in one transaction. If the period has already been processed, the
+          system will refuse (<strong>duplicate prevention</strong>) — re-processing requires an
+          administrator override with a recorded reason.
+        </p>
+        <form method="POST" action="/payroll/process">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Year</label>
+              <select class="form-select" name="year" required>
+                <% for (let y = year; y >= year - 5; y--) { %>
+                  <option value="<%= y %>"><%= y %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Month</label>
+              <select class="form-select" name="month" required>
+                <% MONTHS.forEach(function(m, i) { %>
+                  <option value="<%= i + 1 %>" <%= i + 1 === month ? 'selected' : '' %>><%= m %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Pay date <span class="text-muted small">(default: configured pay day)</span></label>
+              <input type="date" class="form-control" name="pay_date" value="<%= payDate %>">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-4">Process payroll</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

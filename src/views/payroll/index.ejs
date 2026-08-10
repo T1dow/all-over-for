@@ -1,0 +1,45 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Payroll history</h4>
+  <a href="/payroll/process" class="btn btn-primary btn-sm">+ Process new period</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Period</th><th>Run</th><th>Status</th><th>Pay date</th>
+          <th>Employees</th><th class="text-end">Gross</th><th class="text-end">Deductions</th>
+          <th class="text-end">Net</th><th>Processed by</th><th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% runs.forEach(function(r) { %>
+          <tr>
+            <td class="fw-semibold"><%= r.period_year %>-<%= String(r.period_month).padStart(2, '0') %></td>
+            <td>#<%= r.run_number %><% if (r.rerun_of_id) { %> <span class="badge text-bg-warning" title="Re-run of #<%= r.rerun_of_id %>">rerun</span><% } %></td>
+            <td>
+              <% if (r.status === 'FINALISED') { %><span class="badge text-bg-success">Finalised</span><% } else { %><span class="badge text-bg-warning">Processed (review)</span><% } %>
+            </td>
+            <td><%= r.pay_date %></td>
+            <td><%= r.employee_count %></td>
+            <td class="text-end">GH₵ <%= Number(r.gross_total).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %></td>
+            <td class="text-end">GH₵ <%= Number(r.deduction_total).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %></td>
+            <td class="text-end fw-semibold">GH₵ <%= Number(r.net_total).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %></td>
+            <td class="small text-muted"><%= r.processor ? r.processor.name : '—' %></td>
+            <td class="text-end">
+              <a href="/payroll/<%= r.id %>" class="btn btn-sm btn-outline-primary">View</a>
+            </td>
+          </tr>
+        <% }); %>
+        <% if (!runs.length) { %>
+          <tr><td colspan="10" class="text-center text-muted py-4">No payroll has been processed yet.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

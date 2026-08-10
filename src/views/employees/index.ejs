@@ -1,0 +1,103 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Employees <span class="text-muted fs-6">(<%= total %>)</span></h4>
+  <% if (can('employees.manage')) { %>
+    <a href="/employees/new" class="btn btn-primary btn-sm">+ Register employee</a>
+  <% } %>
+</div>
+
+<form method="GET" action="/employees" class="row g-2 mb-3">
+  <div class="col-md-5">
+    <input type="text" class="form-control form-control-sm" name="q" placeholder="Search name, number or email..."
+           value="<%= filters.q %>">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select form-select-sm" name="department_id">
+      <option value="">All departments</option>
+      <% departments.forEach(function(d) { %>
+        <option value="<%= d.id %>" <%= String(filters.department_id) === String(d.id) ? 'selected' : '' %>><%= d.name %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select class="form-select form-select-sm" name="status">
+      <option value="">All statuses</option>
+      <% STATUSES.forEach(function(s) { %>
+        <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2 d-flex gap-2">
+    <button type="submit" class="btn btn-sm btn-primary w-100">Search</button>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Name</th>
+          <th>Department</th>
+          <th>Position</th>
+          <th>Campus</th>
+          <th>SSNIT</th>
+          <th>Bank account</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% employees.forEach(function(e) { %>
+          <tr>
+            <td class="text-muted"><%= e.employee_no %></td>
+            <td><%= e.first_name %> <%= e.last_name %></td>
+            <td><%= e.department ? e.department.name : '—' %></td>
+            <td><%= e.position %></td>
+            <td><%= e.campus || '—' %></td>
+            <td class="font-monospace small text-muted"><%= maskSsnit(e.ssnit_no) %></td>
+            <td class="font-monospace small text-muted"><%= maskAccount(e.bank_account) %></td>
+            <td>
+              <% const badge = { ACTIVE: 'success', ON_LEAVE: 'warning', TERMINATED: 'secondary' }; %>
+              <span class="badge text-bg-<%= badge[e.employment_status] || 'secondary' %>"><%= e.employment_status %></span>
+            </td>
+            <td class="text-end">
+              <a href="/employees/<%= e.id %>" class="btn btn-sm btn-outline-secondary">View</a>
+              <% if (can('employees.manage')) { %>
+                <a href="/employees/<%= e.id %>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                <form method="POST" action="/employees/<%= e.id %>/status" class="d-inline-flex gap-1">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <select name="status" class="form-select form-select-sm" style="width:auto">
+                    <% STATUSES.forEach(function(s) { %>
+                      <option value="<%= s %>" <%= e.employment_status === s ? 'selected' : '' %>><%= s %></option>
+                    <% }); %>
+                  </select>
+                  <button type="submit" class="btn btn-sm btn-outline-warning" title="Change status">Set</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+        <% if (!employees.length) { %>
+          <tr><td colspan="9" class="text-center text-muted py-4">No employees match your search.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (pages > 1) { %>
+  <nav class="mt-3">
+    <ul class="pagination pagination-sm">
+      <% for (let p = 1; p <= pages; p++) { %>
+        <li class="page-item <%= p === page ? 'active' : '' %>">
+          <a class="page-link" href="/employees?page=<%= p %>&q=<%= encodeURIComponent(filters.q) %>&department_id=<%= filters.department_id %>&status=<%= filters.status %>"><%= p %></a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+<% } %>
+
+<%- include('../partials/footer') %>

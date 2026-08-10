@@ -1,0 +1,55 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">System users</h4>
+  <a href="/users/new" class="btn btn-primary btn-sm">+ New user</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Last login</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(function(u) { %>
+          <tr>
+            <td><%= u.id %></td>
+            <td><%= u.name %><% if (u.must_change_password) { %> <span class="badge text-bg-warning" title="Must set a new password">reset</span><% } %></td>
+            <td><%= u.email %></td>
+            <td><span class="badge text-bg-primary"><%= ROLE_LABELS[u.role] %></span></td>
+            <td>
+              <% if (u.is_active) { %>
+                <span class="badge text-bg-success">Active</span>
+              <% } else { %>
+                <span class="badge text-bg-secondary">Disabled</span>
+              <% } %>
+            </td>
+            <td class="small text-muted"><%= u.last_login_at ? new Date(u.last_login_at).toLocaleString() : '—' %></td>
+            <td class="text-end">
+              <a href="/users/<%= u.id %>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+              <% if (Number(u.id) !== Number(currentUser.id)) { %>
+                <form method="POST" action="/users/<%= u.id %>/reset-password" class="d-inline-flex gap-1">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <input type="text" class="form-control form-control-sm" name="temp_password"
+                         placeholder="Temp password" required minlength="8" style="width: 130px">
+                  <button type="submit" class="btn btn-sm btn-outline-warning" title="Reset password (user must change it at next login)">Reset</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

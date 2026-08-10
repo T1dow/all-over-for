@@ -1,0 +1,58 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Remittance report (SSNIT &amp; PAYE)</h4>
+  <a href="/reports" class="btn btn-sm btn-outline-secondary">Back to reports</a>
+</div>
+
+<form method="GET" action="/reports/remittance" class="row g-2 mb-3">
+  <div class="col-md-4">
+    <select class="form-select form-select-sm" name="run_id">
+      <% runs.forEach(function(r) { %>
+        <option value="<%= r.id %>" <%= report && report.run.id === r.id ? 'selected' : '' %>>
+          <%= r.period_year %>-<%= String(r.period_month).padStart(2, '0') %> (run #<%= r.run_number %>)
+        </option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-sm btn-primary">View</button></div>
+</form>
+
+<% if (report) { %>
+  <div class="row g-3">
+    <div class="col-md-5">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold">Statutory deductions — <%= report.run.period_year %>-<%= String(report.run.period_month).padStart(2, '0') %></div>
+        <table class="table table-sm mb-0">
+          <tbody>
+            <tr><th>SSNIT (Employee 5.5%)</th><td class="text-end fw-semibold"><%= money(report.ssnit) %></td></tr>
+            <tr><th>PAYE Income Tax (WHT)</th><td class="text-end fw-semibold"><%= money(report.paye) %></td></tr>
+            <tr class="table-light"><th>Total statutory to remit</th><td class="text-end fw-bold"><%= money(report.totalStatutory) %></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-secondary small mt-3 mb-0">
+        Filing deadlines (Ghana): PAYE by the <strong>15th</strong> of the following month via GRA TaxPro;
+        SSNIT by the <strong>14th</strong>. The system produces the figures; submission remains with the
+        school's finance office.
+      </div>
+    </div>
+    <div class="col-md-7">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold">Other deductions collected (remit to respective bodies)</div>
+        <table class="table table-sm mb-0">
+          <thead><tr><th>Deduction</th><th class="text-end">Amount</th></tr></thead>
+          <tbody>
+            <% report.custom.forEach(function(c) { %>
+              <tr><td><%= c.name %></td><td class="text-end"><%= money(c.amount) %></td></tr>
+            <% }); %>
+            <% if (!report.custom.length) { %><tr><td colspan="2" class="text-muted">No custom deductions in this period.</td></tr><% } %>
+          </tbody>
+          <tfoot><tr class="table-light fw-semibold"><td>GRAND TOTAL</td><td class="text-end"><%= money(report.grandTotal) %></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,15 @@
+<%- include('../partials/head') %>
+
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card shadow-sm border-<%= statusCode === 404 ? 'warning' : 'danger' %>">
+      <div class="card-body text-center py-5">
+        <div class="display-1 fw-bold text-<%= statusCode === 404 ? 'warning' : 'danger' %>"><%= statusCode %></div>
+        <h4 class="mt-2"><%= message %></h4>
+        <a href="/" class="btn btn-primary mt-3">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

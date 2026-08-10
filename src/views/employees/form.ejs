@@ -1,0 +1,127 @@
+<%- include('../partials/head') %>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">
+        <%= employee ? 'Edit employee' : 'Register new employee' %>
+      </div>
+      <div class="card-body">
+        <% if (errors.length) { %>
+          <div class="alert alert-danger" role="alert">
+            <ul class="mb-0"><% errors.forEach(function(e) { %><li><%= e %></li><% }); %></ul>
+          </div>
+        <% } %>
+
+        <form method="POST" action="<%= employee ? '/employees/' + employee.id : '/employees' %>">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <h6 class="text-primary mt-1">Identity</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Employee number</label>
+              <input type="text" class="form-control" name="employee_no" value="<%= values.employee_no || suggestedNo %>" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">First name</label>
+              <input type="text" class="form-control" name="first_name" value="<%= values.first_name || '' %>" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Last name</label>
+              <input type="text" class="form-control" name="last_name" value="<%= values.last_name || '' %>" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Other names</label>
+              <input type="text" class="form-control" name="other_names" value="<%= values.other_names || '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Gender</label>
+              <select class="form-select" name="gender">
+                <option value="">—</option>
+                <% ['MALE','FEMALE','OTHER'].forEach(function(g) { %>
+                  <option value="<%= g %>" <%= values.gender === g ? 'selected' : '' %>><%= g %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date of birth</label>
+              <input type="date" class="form-control" name="date_of_birth" value="<%= values.date_of_birth || '' %>">
+            </div>
+          </div>
+
+          <h6 class="text-primary mt-4">Contact &amp; personal</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Phone</label>
+              <input type="tel" class="form-control" name="phone" value="<%= values.phone || '' %>">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Email <span class="text-muted small">(payslip delivery address)</span></label>
+              <input type="email" class="form-control" name="email" value="<%= values.email || '' %>" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Residential address</label>
+              <textarea class="form-control" name="address" rows="2"><%= values.address || '' %></textarea>
+            </div>
+          </div>
+
+          <h6 class="text-primary mt-4">Employment</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Department</label>
+              <select class="form-select" name="department_id" required>
+                <option value="">Select…</option>
+                <% departments.forEach(function(d) { %>
+                  <option value="<%= d.id %>" <%= String(values.department_id) === String(d.id) ? 'selected' : '' %>><%= d.name %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Position / job title</label>
+              <input type="text" class="form-control" name="position" value="<%= values.position || '' %>" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Campus</label>
+              <input type="text" class="form-control" name="campus" value="<%= values.campus || '' %>" placeholder="Main / Annex">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Hire date</label>
+              <input type="date" class="form-control" name="hire_date" value="<%= values.hire_date || '' %>" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Employment status</label>
+              <select class="form-select" name="employment_status">
+                <% STATUSES.forEach(function(s) { %>
+                  <option value="<%= s %>" <%= (values.employment_status || 'ACTIVE') === s ? 'selected' : '' %>><%= s %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <h6 class="text-primary mt-4">Statutory &amp; bank (masked in lists)</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">SSNIT number</label>
+              <input type="text" class="form-control" name="ssnit_no" value="<%= values.ssnit_no || '' %>" placeholder="GHA-…">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Bank name</label>
+              <input type="text" class="form-control" name="bank_name" value="<%= values.bank_name || '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Bank account number</label>
+              <input type="text" class="form-control" name="bank_account" value="<%= values.bank_account || '' %>">
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary"><%= employee ? 'Save changes' : 'Register employee' %></button>
+            <a href="/employees" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

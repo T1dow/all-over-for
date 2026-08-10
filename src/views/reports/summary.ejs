@@ -1,0 +1,66 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Payroll summary</h4>
+  <a href="/reports" class="btn btn-sm btn-outline-secondary">Back to reports</a>
+</div>
+
+<form method="GET" action="/reports/summary" class="row g-2 mb-3">
+  <div class="col-md-4">
+    <select class="form-select form-select-sm" name="run_id">
+      <% runs.forEach(function(r) { %>
+        <option value="<%= r.id %>" <%= selected && selected.run.id === r.id ? 'selected' : '' %>>
+          <%= r.period_year %>-<%= String(r.period_month).padStart(2, '0') %> (run #<%= r.run_number %>, <%= r.status %>)
+        </option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-sm btn-primary">View</button></div>
+  <% if (selected) { const label = selected.run.period_year + '-' + String(selected.run.period_month).padStart(2, '0'); %>
+    <div class="col-md-6 text-end">
+      <a class="btn btn-sm btn-outline-success" href="/reports/summary/export?run_id=<%= selected.run.id %>&format=csv">CSV</a>
+      <a class="btn btn-sm btn-outline-success" href="/reports/summary/export?run_id=<%= selected.run.id %>&format=xlsx">Excel</a>
+      <a class="btn btn-sm btn-outline-success" href="/reports/summary/export?run_id=<%= selected.run.id %>&format=pdf">PDF</a>
+    </div>
+  <% } %>
+</form>
+
+<% if (selected) { %>
+  <div class="card shadow-sm">
+    <div class="table-responsive"><table class="table table-sm table-hover align-middle mb-0">
+      <thead><tr>
+        <th>Ref</th><th>Employee</th><th>Department</th><th class="text-end">Basic</th>
+        <th class="text-end">Gross</th><th class="text-end">SSNIT</th><th class="text-end">PAYE</th>
+        <th class="text-end">Total ded.</th><th class="text-end">Net pay</th>
+      </tr></thead>
+      <tbody>
+        <% selected.rows.forEach(function(r) { %>
+          <tr>
+            <td class="font-monospace small text-muted"><%= r.reference %></td>
+            <td><%= r.employeeNo %> — <%= r.name %></td>
+            <td><%= r.department %></td>
+            <td class="text-end"><%= money(r.basic) %></td>
+            <td class="text-end"><%= money(r.gross) %></td>
+            <td class="text-end"><%= money(r.ssnit) %></td>
+            <td class="text-end"><%= money(r.paye) %></td>
+            <td class="text-end"><%= money(r.totalDeductions) %></td>
+            <td class="text-end fw-semibold"><%= money(r.net) %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+      <tfoot>
+        <tr class="table-light fw-semibold">
+          <td colspan="3">TOTALS (<%= selected.rows.length %> employees)</td>
+          <td class="text-end"><%= money(selected.rows.reduce((s, r) => s + r.basic, 0)) %></td>
+          <td class="text-end"><%= money(selected.rows.reduce((s, r) => s + r.gross, 0)) %></td>
+          <td class="text-end"><%= money(selected.rows.reduce((s, r) => s + r.ssnit, 0)) %></td>
+          <td class="text-end"><%= money(selected.rows.reduce((s, r) => s + r.paye, 0)) %></td>
+          <td class="text-end"><%= money(selected.rows.reduce((s, r) => s + r.totalDeductions, 0)) %></td>
+          <td class="text-end"><%= money(selected.rows.reduce((s, r) => s + r.net, 0)) %></td>
+        </tr>
+      </tfoot>
+    </table></div>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

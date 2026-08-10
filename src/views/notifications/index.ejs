@@ -1,0 +1,97 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Email notifications</h4>
+  <div class="d-flex gap-2">
+    <span class="align-self-center small text-muted">
+      Dispatch <%= emailEnabled === 'false' ? 'is <strong class="text-danger">DISABLED</strong>' : 'is <strong class="text-success">ENABLED</strong>' %>
+    </span>
+    <form method="POST" action="/notifications/dispatch">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="btn btn-primary btn-sm">▶ Dispatch due now</button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <% const colors = { PENDING: 'warning', SENT: 'success', FAILED: 'danger', RETRYING: 'info' }; %>
+  <% ['PENDING', 'SENT', 'FAILED', 'RETRYING'].forEach(function(s) { %>
+    <div class="col-md-3">
+      <div class="border rounded p-2 text-center small">
+        <div class="fw-bold fs-5 text-<%= colors[s] %>"><%= summary[s] %></div>
+        <span class="badge text-bg-<%= colors[s] %>"><%= s %></span>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+<form method="GET" action="/notifications" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <select class="form-select form-select-sm" name="status">
+      <option value="">All statuses</option>
+      <% ['PENDING','SENT','FAILED','RETRYING'].forEach(function(s) { %>
+        <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select class="form-select form-select-sm" name="run_id">
+      <option value="">All runs</option>
+      <% runs.forEach(function(r) { %>
+        <option value="<%= r.id %>" <%= String(filters.run_id) === String(r.id) ? 'selected' : '' %>>
+          <%= r.period_year %>-<%= String(r.period_month).padStart(2, '0') %> (run #<%= r.run_number %>)
+        </option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>#</th><th>Employee</th><th>Recipient</th><th>Payslip</th><th>Status</th>
+          <th>Attempts</th><th>Next retry</th><th>Last error</th><th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% notifications.forEach(function(n) { %>
+          <tr>
+            <td class="text-muted small"><%= n.id %></td>
+            <td><%= n.employee ? n.employee.employee_no + ' — ' + n.employee.first_name + ' ' + n.employee.last_name : '—' %></td>
+            <td class="small"><%= n.recipient_email %></td>
+            <td class="font-monospace small text-muted"><%= n.payslip ? n.payslip.reference : '—' %></td>
+            <td><span class="badge text-bg-<%= colors[n.status] %>"><%= n.status %></span></td>
+            <td><%= n.attempts %></td>
+            <td class="small text-muted"><%= n.next_retry_at ? new Date(n.next_retry_at).toLocaleString() : '—' %></td>
+            <td class="small text-danger" style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap"
+                title="<%= n.last_error || '' %>"><%= n.last_error || '—' %></td>
+            <td class="text-end">
+              <% if (n.status === 'FAILED' || n.status === 'RETRYING') { %>
+                <form method="POST" action="/notifications/<%= n.id %>/resend" class="d-inline">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="btn btn-sm btn-outline-warning">Resend</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+        <% if (!notifications.length) { %>
+          <tr><td colspan="9" class="text-center text-muted py-4">No notifications found. Finalise a payroll run to queue payslip emails.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="text-muted small mt-2">
+  Retry backoff: 5 min → 15 min → 1 hour (max <%= 3 %> attempts, then FAILED). Subjects and bodies never contain
+  salary amounts (security rule FR-39). In <code>json</code> test mode, delivered messages are captured in
+  <code>storage/test-mail/</code>.
+</p>
+
+<%- include('../partials/footer') %>

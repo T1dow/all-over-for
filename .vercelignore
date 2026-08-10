@@ -1,0 +1,14 @@
+# Files that should NOT be uploaded to Vercel (keeps the bundle small)
+docs/
+scripts/
+test/
+data/
+storage/
+*.sqlite
+*.sqlite3
+*.md
+.env
+.env.*
+!.env.example
+.git/
+.gitignore

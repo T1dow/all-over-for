@@ -1,0 +1,92 @@
+<%- include('../partials/head') %>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Welcome, <%= user.name %></div>
+      <div class="card-body">
+        <p class="text-muted">You are signed in as <span class="badge text-bg-primary"><%= roleLabel %></span></p>
+
+        <div class="row g-3 mt-1">
+          <% if (data.userCount !== undefined) { %>
+          <div class="col-sm-4">
+            <div class="border rounded p-3 text-center">
+              <div class="fs-3 fw-bold text-primary"><%= data.userCount %></div>
+              <div class="small text-muted">System users</div>
+            </div>
+          </div>
+          <% } %>
+          <% if (data.employeeCount !== undefined) { %>
+          <div class="col-sm-4">
+            <div class="border rounded p-3 text-center">
+              <div class="fs-3 fw-bold text-primary"><%= data.employeeCount %></div>
+              <div class="small text-muted">Employees</div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="border rounded p-3 text-center">
+              <div class="fs-3 fw-bold text-primary"><%= data.departmentCount %></div>
+              <div class="small text-muted">Departments</div>
+            </div>
+          </div>
+          <% } %>
+          <% if (data.runCount !== undefined) { %>
+          <div class="col-sm-4">
+            <div class="border rounded p-3 text-center">
+              <div class="fs-3 fw-bold text-primary"><%= data.runCount %></div>
+              <div class="small text-muted">Payroll runs</div>
+            </div>
+          </div>
+          <% } %>
+          <% if (data.myPayslipCount !== undefined) { %>
+          <div class="col-sm-4">
+            <div class="border rounded p-3 text-center">
+              <div class="fs-3 fw-bold text-primary"><%= data.myPayslipCount %></div>
+              <div class="small text-muted">My payslips</div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="border rounded p-3 text-center">
+              <div class="fs-3 fw-bold text-primary"><%= data.myNotifications %></div>
+              <div class="small text-muted">Email notifications</div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+
+        <% if (data.latestRun) { %>
+          <div class="alert alert-info small mt-3 mb-0">
+            Latest payroll: <strong><%= data.latestRun.period_year %>-<%= String(data.latestRun.period_month).padStart(2, '0') %></strong>
+            (run #<%= data.latestRun.run_number %>, status <%= data.latestRun.status %>)
+          </div>
+        <% } %>
+
+        <% if (user.role === 'EMPLOYEE' && !user.employeeId) { %>
+          <div class="alert alert-warning small mt-3 mb-0">
+            Your account is not linked to an employee record yet — contact the payroll office.
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">What you can do</div>
+      <ul class="list-group list-group-flush small">
+        <% navItems.forEach(function(item) { if (can(item.permission)) { %>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span><%= item.label %></span>
+            <% if (item.available) { %>
+              <a href="<%= item.href %>" class="btn btn-sm btn-outline-primary">Open</a>
+            <% } else { %>
+              <span class="badge text-bg-secondary" title="Becomes available in <%= item.stage %>"><%= item.stage %></span>
+            <% } %>
+          </li>
+        <% } }); %>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

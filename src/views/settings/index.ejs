@@ -1,0 +1,106 @@
+<%- include('../partials/head') %>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">System settings</div>
+      <div class="card-body">
+        <% if (errors.length) { %>
+          <div class="alert alert-danger"><ul class="mb-0"><% errors.forEach(function(e) { %><li><%= e %></li><% }); %></ul></div>
+        <% } %>
+        <form method="POST" action="/settings">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <h6 class="text-primary">School</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">School name</label>
+              <input type="text" class="form-control" name="school.name" value="<%= values['school.name'] %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">School address</label>
+              <input type="text" class="form-control" name="school.address" value="<%= values['school.address'] %>">
+            </div>
+          </div>
+
+          <h6 class="text-primary">Payroll &amp; scheduling</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Pay day (1–31)</label>
+              <input type="number" class="form-control" name="payroll.pay_date" value="<%= values['payroll.pay_date'] %>" min="1" max="31">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Schedule time (HH:MM)</label>
+              <input type="text" class="form-control" name="payroll.schedule_time" value="<%= values['payroll.schedule_time'] %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Scheduler: monthly payroll job</label>
+              <select class="form-select" name="scheduler.payroll_enabled">
+                <option value="true" <%= values['scheduler.payroll_enabled'] === 'true' ? 'selected' : '' %>>Enabled</option>
+                <option value="false" <%= values['scheduler.payroll_enabled'] === 'false' ? 'selected' : '' %>>Disabled</option>
+              </select>
+            </div>
+          </div>
+
+          <h6 class="text-primary">Email notifications</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Dispatch enabled</label>
+              <select class="form-select" name="email.enabled">
+                <option value="true" <%= values['email.enabled'] === 'true' ? 'selected' : '' %>>Enabled</option>
+                <option value="false" <%= values['email.enabled'] === 'false' ? 'selected' : '' %>>Disabled</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Transport</label>
+              <select class="form-select" name="email.transport">
+                <option value="json" <%= values['email.transport'] === 'json' ? 'selected' : '' %>>json (demo capture)</option>
+                <option value="smtp" <%= values['email.transport'] === 'smtp' ? 'selected' : '' %>>smtp (real email)</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Max attempts</label>
+              <input type="number" class="form-control" name="email.max_attempts" value="<%= values['email.max_attempts'] %>" min="1" max="10">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Scheduler: email dispatcher</label>
+              <select class="form-select" name="scheduler.email_enabled">
+                <option value="true" <%= values['scheduler.email_enabled'] === 'true' ? 'selected' : '' %>>Enabled</option>
+                <option value="false" <%= values['scheduler.email_enabled'] === 'false' ? 'selected' : '' %>>Disabled</option>
+              </select>
+            </div>
+          </div>
+
+          <h6 class="text-primary">Statutory (SSNIT &amp; PAYE) — <span class="text-muted small">verify with GRA/SSNIT before live use</span></h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">SSNIT employee rate (%)</label>
+              <input type="number" step="0.1" class="form-control" name="ssnit.rate" value="<%= values['ssnit.rate'] %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">SSNIT insurable ceiling (GHS/yr)</label>
+              <input type="number" class="form-control" name="ssnit.ceiling_annual" value="<%= values['ssnit.ceiling_annual'] %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">PAYE method</label>
+              <select class="form-select" name="tax.method">
+                <option value="ANNUALISED" <%= values['tax.method'] === 'ANNUALISED' ? 'selected' : '' %>>ANNUALISED (GRA official)</option>
+                <option value="MONTHLY" <%= values['tax.method'] === 'MONTHLY' ? 'selected' : '' %>>MONTHLY (register-style)</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">PAYE annual brackets (JSON)</label>
+              <textarea class="form-control font-monospace small" name="tax.paye_brackets" rows="8"><%= values['tax.paye_brackets'] %></textarea>
+              <div class="form-text">Format: [{"up_to":5880,"rate":0},{"up_to":7200,"rate":5},...,{"up_to":null,"rate":35}] — last band open-ended.</div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Save settings</button>
+          <a href="/dashboard" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

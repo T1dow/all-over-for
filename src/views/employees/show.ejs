@@ -1,0 +1,92 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0"><%= employee.first_name %> <%= employee.last_name %>
+    <span class="badge text-bg-primary fs-6"><%= employee.employee_no %></span></h4>
+  <div>
+    <% if (can('employees.manage')) { %>
+      <a href="/employees/<%= employee.id %>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+    <% } %>
+    <a href="/employees" class="btn btn-sm btn-outline-secondary">Back to list</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Personal &amp; employment details</div>
+      <table class="table table-sm mb-0">
+        <tbody>
+          <tr><th class="w-25">Position</th><td><%= employee.position %> · <%= employee.department ? employee.department.name : '—' %> · <%= employee.campus || '—' %></td></tr>
+          <tr><th>Hire date</th><td><%= employee.hire_date %></td></tr>
+          <tr><th>Status</th>
+            <td>
+              <% const badge = { ACTIVE: 'success', ON_LEAVE: 'warning', TERMINATED: 'secondary' }; %>
+              <span class="badge text-bg-<%= badge[employee.employment_status] || 'secondary' %>"><%= employee.employment_status %></span>
+            </td>
+          </tr>
+          <tr><th>Phone</th><td><%= employee.phone || '—' %></td></tr>
+          <tr><th>Email</th><td><%= employee.email %></td></tr>
+          <tr><th>Gender</th><td><%= employee.gender || '—' %></td></tr>
+          <tr><th>Date of birth</th><td><%= employee.date_of_birth || '—' %></td></tr>
+          <tr><th>Address</th><td><%= employee.address || '—' %></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-header bg-white fw-semibold">Salary &amp; benefits</div>
+      <div class="card-body">
+        <% if (salary) { %>
+          <p class="mb-1"><strong>Basic salary:</strong> GH₵ <%= Number(salary.basic_salary).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %>
+            <span class="text-muted small">(effective <%= salary.effective_from %>)</span></p>
+        <% } else { %>
+          <p class="text-muted small mb-1">No salary record yet — set one up in the salary module (Stage 6).</p>
+        <% } %>
+        <% if (allowances.length) { %>
+          <p class="mb-0 small text-muted">Allowances:
+            <%= allowances.map(function(a) { return a.allowance.name; }).join(', ') %></p>
+        <% } %>
+        <% if (deductions.length) { %>
+          <p class="mb-0 small text-muted">Deductions:
+            <%= deductions.map(function(d) { return d.deduction.name; }).join(', ') %></p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Sensitive identifiers</div>
+      <table class="table table-sm mb-0">
+        <tbody>
+          <tr>
+            <th>SSNIT number</th>
+            <td class="font-monospace">
+              <% if (showFull) { %><%= employee.ssnit_no || '—' %><% } else { %><%= maskSsnit(employee.ssnit_no) %><% } %>
+            </td>
+          </tr>
+          <tr>
+            <th>Bank</th>
+            <td><%= employee.bank_name || '—' %></td>
+          </tr>
+          <tr>
+            <th>Account number</th>
+            <td class="font-monospace">
+              <% if (showFull) { %><%= employee.bank_account || '—' %><% } else { %><%= maskAccount(employee.bank_account) %><% } %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="card-footer bg-white small text-muted">
+        <% if (showFull) { %>
+          Full values visible to payroll administrators.
+        <% } else { %>
+          Full values are masked for your role — ask the payroll office if you need them.
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

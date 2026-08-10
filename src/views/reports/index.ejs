@@ -1,0 +1,69 @@
+<%- include('../partials/head') %>
+
+<h4 class="mb-3">Reports &amp; analytics</h4>
+
+<% if (stats.latestRun) { %>
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="border rounded p-3 text-center"><div class="fs-4 fw-bold text-primary"><%= stats.activeCount %>/<%= stats.employeeCount %></div><div class="small text-muted">Active employees</div></div></div>
+    <div class="col-md-3"><div class="border rounded p-3 text-center"><div class="fs-4 fw-bold text-primary"><%= stats.runCount %></div><div class="small text-muted">Payroll runs</div></div></div>
+    <div class="col-md-3"><div class="border rounded p-3 text-center"><div class="fs-4 fw-bold text-success"><%= stats.notif.SENT %></div><div class="small text-muted">Payslip emails sent</div></div></div>
+    <div class="col-md-3"><div class="border rounded p-3 text-center"><div class="fs-4 fw-bold text-danger"><%= stats.notif.FAILED %></div><div class="small text-muted">Emails failed</div></div></div>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-semibold">Net pay by month</div>
+    <div class="card-body">
+      <div class="d-flex align-items-end gap-2" style="height:120px">
+        <% Object.entries(stats.byMonth).slice(-6).forEach(function([k, v]) { %>
+          <div class="flex-fill text-center">
+            <div class="small text-muted">GH₵ <%= Math.round(v.net / 1000) %>k</div>
+            <div class="bg-primary rounded-top mx-auto" style="height:<%= Math.max(4, Math.round(v.net / Math.max.apply(null, Object.values(stats.byMonth).map(x => x.net)) * 90)) %>px; width:70%"></div>
+            <div class="small text-muted mt-1"><%= k.slice(2) %></div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+
+  <% if (stats.deptRows.length) { %>
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white fw-semibold">Latest period — cost by department</div>
+    <div class="table-responsive"><table class="table table-sm mb-0">
+      <thead><tr><th>Department</th><th class="text-end">Employees</th><th class="text-end">Gross</th><th class="text-end">Net</th></tr></thead>
+      <tbody>
+        <% stats.deptRows.forEach(function(d) { %>
+          <tr><td><%= d.department %></td><td class="text-end"><%= d.employees %></td>
+          <td class="text-end"><%= money(d.gross) %></td><td class="text-end fw-semibold"><%= money(d.net) %></td></tr>
+        <% }); %>
+      </tbody>
+    </table></div>
+  </div>
+  <% } %>
+<% } else { %>
+  <div class="alert alert-info">No payroll runs yet — process a period first, then explore the reports below.</div>
+<% } %>
+
+<div class="row g-3">
+  <div class="col-md-3"><a href="/reports/summary" class="text-decoration-none">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <div class="fs-5 fw-bold text-primary">Payroll summary</div>
+      <p class="text-muted small mb-0 mt-1">Per-employee earnings &amp; deductions for any period — CSV / Excel / PDF.</p>
+    </div></div></a></div>
+  <div class="col-md-3"><a href="/reports/departmental" class="text-decoration-none">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <div class="fs-5 fw-bold text-primary">Departmental</div>
+      <p class="text-muted small mb-0 mt-1">Payroll cost grouped by department — budgeting &amp; management.</p>
+    </div></div></a></div>
+  <div class="col-md-3"><a href="/reports/remittance" class="text-decoration-none">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <div class="fs-5 fw-bold text-primary">Remittance (SSNIT/PAYE)</div>
+      <p class="text-muted small mb-0 mt-1">Statutory totals for GRA &amp; SSNIT filing — due by the 15th / 14th.</p>
+    </div></div></a></div>
+  <div class="col-md-3"><a href="/reports/employee" class="text-decoration-none">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <div class="fs-5 fw-bold text-primary">Employee history</div>
+      <p class="text-muted small mb-0 mt-1">Complete payslip history for any employee, all periods.</p>
+    </div></div></a></div>
+</div>
+
+<%- include('../partials/footer') %>

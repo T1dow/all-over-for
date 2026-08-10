@@ -1,0 +1,56 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Departmental report</h4>
+  <a href="/reports" class="btn btn-sm btn-outline-secondary">Back to reports</a>
+</div>
+
+<form method="GET" action="/reports/departmental" class="row g-2 mb-3">
+  <div class="col-md-4">
+    <select class="form-select form-select-sm" name="run_id">
+      <% runs.forEach(function(r) { %>
+        <option value="<%= r.id %>" <%= report && report.run.id === r.id ? 'selected' : '' %>>
+          <%= r.period_year %>-<%= String(r.period_month).padStart(2, '0') %> (run #<%= r.run_number %>)
+        </option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-sm btn-primary">View</button></div>
+</form>
+
+<% if (report) { %>
+  <div class="card shadow-sm">
+    <div class="table-responsive"><table class="table table-sm align-middle mb-0">
+      <thead><tr>
+        <th>Department</th><th class="text-end">Employees</th><th class="text-end">Gross</th>
+        <th class="text-end">SSNIT</th><th class="text-end">PAYE</th><th class="text-end">Deductions</th><th class="text-end">Net pay</th>
+      </tr></thead>
+      <tbody>
+        <% report.rows.forEach(function(d) { %>
+          <tr>
+            <td><%= d.department %></td>
+            <td class="text-end"><%= d.employees %></td>
+            <td class="text-end"><%= money(d.gross) %></td>
+            <td class="text-end"><%= money(d.ssnit) %></td>
+            <td class="text-end"><%= money(d.paye) %></td>
+            <td class="text-end"><%= money(d.deductions) %></td>
+            <td class="text-end fw-semibold"><%= money(d.net) %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+      <tfoot>
+        <tr class="table-light fw-semibold">
+          <td>TOTALS</td>
+          <td class="text-end"><%= report.totals.employees %></td>
+          <td class="text-end"><%= money(report.totals.gross) %></td>
+          <td class="text-end"><%= money(report.totals.ssnit) %></td>
+          <td class="text-end"><%= money(report.totals.paye) %></td>
+          <td class="text-end"><%= money(report.totals.deductions) %></td>
+          <td class="text-end"><%= money(report.totals.net) %></td>
+        </tr>
+      </tfoot>
+    </table></div>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

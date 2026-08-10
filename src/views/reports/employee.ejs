@@ -1,0 +1,55 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Employee payslip history</h4>
+  <a href="/reports" class="btn btn-sm btn-outline-secondary">Back to reports</a>
+</div>
+
+<form method="GET" action="/reports/employee" class="row g-2 mb-3">
+  <div class="col-md-5">
+    <select class="form-select form-select-sm" name="employee_id">
+      <option value="">Select employee…</option>
+      <% employees.forEach(function(e) { %>
+        <option value="<%= e.id %>" <%= report && report.employee.id === e.id ? 'selected' : '' %>>
+          <%= e.employee_no %> — <%= e.first_name %> <%= e.last_name %>
+        </option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-sm btn-primary">View</button></div>
+</form>
+
+<% if (report) { %>
+  <div class="alert alert-light border small">
+    <strong><%= report.employee.first_name %> <%= report.employee.last_name %></strong> ·
+    <%= report.employee.employee_no %> · <%= report.employee.position %> ·
+    <%= report.employee.department ? report.employee.department.name : '—' %> · <strong><%= report.rows.length %></strong> payslip(s)
+  </div>
+  <div class="card shadow-sm">
+    <div class="table-responsive"><table class="table table-sm align-middle mb-0">
+      <thead><tr>
+        <th>Period</th><th>Reference</th><th>Pay date</th><th class="text-end">Gross</th>
+        <th class="text-end">SSNIT</th><th class="text-end">PAYE</th><th class="text-end">Deductions</th>
+        <th class="text-end">Net pay</th><th>Status</th>
+      </tr></thead>
+      <tbody>
+        <% report.rows.forEach(function(r) { %>
+          <tr>
+            <td class="fw-semibold"><%= r.period %></td>
+            <td class="font-monospace small text-muted"><%= r.reference %></td>
+            <td><%= r.payDate %></td>
+            <td class="text-end"><%= money(r.gross) %></td>
+            <td class="text-end"><%= money(r.ssnit) %></td>
+            <td class="text-end"><%= money(r.paye) %></td>
+            <td class="text-end"><%= money(r.totalDeductions) %></td>
+            <td class="text-end fw-semibold"><%= money(r.net) %></td>
+            <td><span class="badge text-bg-<%= r.status === 'FINALISED' ? 'success' : 'warning' %>"><%= r.status %></span></td>
+          </tr>
+        <% }); %>
+        <% if (!report.rows.length) { %><tr><td colspan="9" class="text-center text-muted py-3">No payslips yet for this employee.</td></tr><% } %>
+      </tbody>
+    </table></div>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

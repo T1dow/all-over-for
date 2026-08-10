@@ -1,0 +1,28 @@
+# --- Environment / secrets ---
+.env
+*.env
+!.env.example
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+*.log
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Database files (SQLite fallback mode) ---
+*.sqlite
+*.sqlite3
+*.db
+
+# --- Generated payslip PDFs (never commit salaries) ---
+storage/payslips/*
+!storage/payslips/.gitkeep
+
+# --- Uploads / temp ---
+tmp/
+coverage/

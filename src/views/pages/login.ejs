@@ -1,0 +1,35 @@
+<%- include('../partials/head') %>
+
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white fw-semibold">Sign in</div>
+      <div class="card-body">
+        <% if (error) { %>
+          <div class="alert alert-danger" role="alert"><%= error %></div>
+        <% } %>
+        <p class="text-muted small mb-3">Use your registered email and password. Accounts are locked after
+          <%= 5 %> failed attempts.</p>
+        <form method="POST" action="/login">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label" for="email">Email address</label>
+            <input type="email" class="form-control" id="email" name="email"
+                   value="<%= typeof email !== 'undefined' ? email : '' %>" required autofocus>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+      </div>
+    </div>
+    <p class="text-center text-muted small mt-3">
+      Demo accounts (seed data): admin@kbk.edu.gh / Admin@123 ·
+      payroll@kbk.edu.gh / Payroll@123 · kwame.mensah@kbk.edu.gh / Emp@123
+    </p>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

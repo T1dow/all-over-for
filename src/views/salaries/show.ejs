@@ -1,0 +1,157 @@
+<%- include('../partials/head') %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Salary — <%= employee.first_name %> <%= employee.last_name %>
+    <span class="badge text-bg-primary fs-6"><%= employee.employee_no %></span></h4>
+  <div>
+    <a href="/employees/<%= employee.id %>" class="btn btn-sm btn-outline-secondary">Employee profile</a>
+    <a href="/employees" class="btn btn-sm btn-outline-secondary">Back to list</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Left: basic salary + history -->
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Basic salary</div>
+      <div class="card-body">
+        <% if (current) { %>
+          <div class="fs-4 fw-bold text-primary mb-1">
+            GH₵ <%= Number(current.basic_salary).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %>
+          </div>
+          <p class="text-muted small">Effective <%= current.effective_from %><% if (current.note) { %> — <%= current.note %><% } %></p>
+        <% } else { %>
+          <p class="text-muted">No salary record yet. Set the first basic salary below.</p>
+        <% } %>
+
+        <form method="POST" action="/employees/<%= employee.id %>/salary" class="row g-2 mt-1">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="col-md-5">
+            <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="basic_salary"
+                   placeholder="Basic salary (GHS)" required>
+          </div>
+          <div class="col-md-4">
+            <input type="date" class="form-control form-control-sm" name="effective_from" required>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-sm btn-primary w-100">Save new salary</button>
+          </div>
+          <div class="col-12">
+            <input type="text" class="form-control form-control-sm" name="note" placeholder="Note (optional, e.g. promotion)">
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-header bg-white fw-semibold">Salary history <span class="text-muted fs-6">(<%= history.length %>)</span></div>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Basic salary</th><th>Effective from</th><th>Note</th></tr></thead>
+        <tbody>
+          <% history.forEach(function(s) { %>
+            <tr>
+              <td class="fw-semibold">GH₵ <%= Number(s.basic_salary).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %></td>
+              <td><%= s.effective_from %></td>
+              <td class="text-muted small"><%= s.note || '—' %></td>
+            </tr>
+          <% }); %>
+          <% if (!history.length) { %><tr><td colspan="3" class="text-muted text-center py-3">No salary history.</td></tr><% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Right: allowances & deductions assignments -->
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Assigned allowances</div>
+      <ul class="list-group list-group-flush">
+        <% assignments.allowances.forEach(function(a) { %>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span><%= a.allowance.name %>
+              <span class="text-muted small">
+                <% if (a.allowance.type === 'PERCENT') { %>(<%= a.percent %>% of basic)<% } else { %>(GH₵ <%= Number(a.amount).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %>)<% } %>
+              </span>
+            </span>
+            <form method="POST" action="/employees/<%= employee.id %>/allowances/<%= a.id %>/delete" class="d-inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+            </form>
+          </li>
+        <% }); %>
+        <% if (!assignments.allowances.length) { %>
+          <li class="list-group-item text-muted small">No allowances assigned.</li>
+        <% } %>
+      </ul>
+      <div class="card-body border-top">
+        <form method="POST" action="/employees/<%= employee.id %>/allowances" class="row g-2">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="col-md-6">
+            <select class="form-select form-select-sm" name="allowance_id" required>
+              <option value="">Add allowance…</option>
+              <% allowances.forEach(function(a) { %>
+                <option value="<%= a.id %>" data-type="<%= a.type %>"><%= a.name %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="amount"
+                   placeholder="Amount / percent" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-sm btn-primary w-100">Assign</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-header bg-white fw-semibold">Assigned deductions</div>
+      <ul class="list-group list-group-flush">
+        <% assignments.deductions.forEach(function(d) { %>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span><%= d.deduction.name %>
+              <span class="text-muted small">
+                <% if (d.deduction.type === 'PERCENT') { %>(<%= d.percent %>% of basic)<% } else { %>(GH₵ <%= Number(d.amount).toLocaleString('en-GH', { minimumFractionDigits: 2 }) %>)<% } %>
+                <% if (d.end_month) { %> until <%= d.end_month %><% } %>
+              </span>
+            </span>
+            <form method="POST" action="/employees/<%= employee.id %>/deductions/<%= d.id %>/delete" class="d-inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+            </form>
+          </li>
+        <% }); %>
+        <% if (!assignments.deductions.length) { %>
+          <li class="list-group-item text-muted small">No custom deductions assigned.</li>
+        <% } %>
+      </ul>
+      <div class="card-body border-top">
+        <form method="POST" action="/employees/<%= employee.id %>/deductions" class="row g-2">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="col-md-6">
+            <select class="form-select form-select-sm" name="deduction_id" required>
+              <option value="">Add deduction…</option>
+              <% deductions.forEach(function(d) { %>
+                <option value="<%= d.id %>"><%= d.name %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="amount"
+                   placeholder="Amount / percent" required>
+          </div>
+          <div class="col-md-3">
+            <input type="month" class="form-control form-control-sm" name="end_month" placeholder="Until (YYYY-MM)">
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-sm btn-primary">Assign deduction</button>
+            <span class="text-muted small ms-2">Loans: set "until" so repayments stop automatically.</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

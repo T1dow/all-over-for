@@ -1,0 +1,62 @@
+<%- include('../partials/head') %>
+
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold"><%= user ? 'Edit user' : 'New user' %></div>
+      <div class="card-body">
+        <% if (errors.length) { %>
+          <div class="alert alert-danger" role="alert">
+            <ul class="mb-0">
+              <% errors.forEach(function(e) { %><li><%= e %></li><% }); %>
+            </ul>
+          </div>
+        <% } %>
+
+        <form method="POST" action="<%= user ? '/users/' + user.id : '/users' %>">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label" for="name">Full name</label>
+            <input type="text" class="form-control" id="name" name="name"
+                   value="<%= user ? user.name : '' %>" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email">Email address</label>
+            <input type="email" class="form-control" id="email" name="email"
+                   value="<%= user ? user.email : '' %>" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="role">Role</label>
+            <select class="form-select" id="role" name="role" required>
+              <% roles.forEach(function(r) { %>
+                <option value="<%= r %>" <%= user && user.role === r ? 'selected' : '' %>><%= ROLE_LABELS[r] %></option>
+              <% }); %>
+            </select>
+            <div class="form-text">Roles control what the user can see and do (Role-Based Access Control).</div>
+          </div>
+
+          <% if (user) { %>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="is_active" name="is_active" <%= user.is_active ? 'checked' : '' %>>
+              <label class="form-check-label" for="is_active">Account active (disabled users cannot log in)</label>
+            </div>
+          <% } else { %>
+            <div class="mb-3">
+              <label class="form-label" for="temp_password">Temporary password</label>
+              <input type="text" class="form-control" id="temp_password" name="temp_password"
+                     placeholder="Give the user a temporary password" required minlength="8">
+              <div class="form-text">The user will be forced to change it at their first login.</div>
+            </div>
+          <% } %>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><%= user ? 'Save changes' : 'Create user' %></button>
+            <a href="/users" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
