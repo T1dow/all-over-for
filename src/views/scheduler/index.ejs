@@ -2,7 +2,7 @@
 
 <h4 class="mb-3">Scheduled processing</h4>
 
-<div class="alert alert-info small">
+<!-- <div class="alert alert-info small">
   <strong>How it works:</strong> two cron jobs run inside the application process.
   The <strong>monthly payroll job</strong> fires on the configured pay day/time and processes the
   current period for all active employees — duplicate prevention (BR-01) still applies, so a period
@@ -14,7 +14,7 @@
     Vercel Cron Jobs (vercel.json) hitting /api/cron/* — see Settings → Cron Jobs. The
     "Run now" buttons below still work for instant testing.</span>
   <% } %>
-</div>
+</div> -->
 
 <div class="row g-4">
   <% const jobs = [
@@ -53,10 +53,10 @@
   <% }); %>
 </div>
 
-<p class="text-muted small mt-4">
+<!-- <p class="text-muted small mt-4">
   Scheduled actions are audit-logged with the <strong>system actor</strong> (<code>scheduler@system.local</code>),
   so the trail always distinguishes automatic runs from human actions. Jobs are idempotent and safe to
   restart (FR-43).
-</p>
+</p> -->
 
 <%- include('../partials/footer') %>
