@@ -1,6 +1,8 @@
 /* app.css — KBK Payroll System */
 body {
   min-height: 100vh;
+    min-height: 100vh;
+
   display: flex;
   flex-direction: column;
 }
@@ -26,4 +28,8 @@ main {
 
 .footer {
   font-size: 0.85rem;
+}
+
+.navbar-text{
+  color: white;
 }
